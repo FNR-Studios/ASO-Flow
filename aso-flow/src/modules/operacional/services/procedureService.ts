@@ -1,14 +1,14 @@
-import { createClient } from "../../../lib/supabase/server";
+import { createClient } from "../../../lib/supabase/client";
 import z from "zod";
 import { getSessionUser } from "../../auth/services/authService";
 import { getOrganizationAction } from "../../admin/services/organizationService";
-import { revalidatePath } from "next/cache";
+
 
 const procedureSchema = z.object({
     id: z.string().uuid().optional(),
     organization_id: z.string().uuid().optional(),
     name: z.string().min(2, "O nome do procedimento é obrigatório."),
-    type: z.enum(["clinico", "laboratorial", "imagem"]),
+    type: z.enum(["CLINICO", "LABORATORIAL", "IMAGEM", "OUTROS"]),
     base_price: z.number().positive("O preço precisa ser maior que zero."),
     tuss_code: z.string().optional()
 })
@@ -64,7 +64,6 @@ export async function upsertProcedureAction(data: ProcedureFormData) {
         }
     }
 
-    revalidatePath('/admin/procedures');
     return {
         success: true,
         data: procedure
@@ -164,7 +163,6 @@ export async function deleteProcedureAction(id: string) {
 
     }
 
-    revalidatePath('/admin/procedures');
     return {
         success: true
     }

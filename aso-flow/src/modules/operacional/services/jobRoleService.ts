@@ -3,7 +3,7 @@ import z from "zod";
 import { revalidatePath } from "next/cache";
 import { getOrganizationAction } from "../../admin/services/organizationService";
 import { getSessionUser } from "../../auth/services/authService";
-import { getClientByIdAction } from "./clientService";
+import { getClientByIdAction } from "../../comercial/services/clientService";
 
 const jobRoleSchema = z.object({
   id: z.string().uuid().optional(),

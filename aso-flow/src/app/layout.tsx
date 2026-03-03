@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import { Header } from "@/src/components/layout/Header";
 import { Footer } from "@/src/components/layout/Footer";
+import { QueryProvider } from "../components/providers/query-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,7 +38,9 @@ export default function RootLayout({
         <Header />
         {/* O main com flex-1 empurra o footer para o fim da tela */}
         <main className="flex-1 flex flex-col">
+        <QueryProvider>
           {children}
+          </QueryProvider>
         </main>
         <Toaster richColors position="top-right" />
         <Footer />
