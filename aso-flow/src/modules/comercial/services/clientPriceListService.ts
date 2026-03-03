@@ -2,7 +2,7 @@ import { createClient } from "../../../lib/supabase/server"
 import z from "zod"
 import { getOrganizationAction } from "../../admin/services/organizationService"
 import { revalidatePath } from "next/cache"
-import { getProceduresByIdAction } from "./procedureService"
+import { getProceduresByIdAction } from "../../operacional/services/procedureService"
 import { getClientByIdAction } from "./clientService"
 import { getSessionUser } from "../../auth/services/authService"
 
