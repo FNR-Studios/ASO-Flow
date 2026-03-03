@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { upsertOrganizationAction, OrganizationFormData } from "@/src/services/organizationService"
+import { upsertOrganizationAction, OrganizationFormData } from "@/src/modules/admin/services/organizationService"
 import { z } from "zod"
 import { toast } from "sonner"
 
@@ -49,7 +49,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
 
   async function onSubmit(data: OrganizationFormData) {
     setIsLoading(true)
-    
+
     const response = await upsertOrganizationAction(data)
 
     if (response?.error) {
@@ -57,7 +57,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
     } else {
       toast.success("Dados da consultoria salvos com sucesso!")
     }
-    
+
     setIsLoading(false)
   }
 
@@ -69,7 +69,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
           Configure as informações principais da sua empresa. Estes dados aparecerão nos relatórios e ASOs.
         </CardDescription>
       </CardHeader>
-      
+
       <CardContent>
         <form id="org-form" onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <input type="hidden" {...register("id")} />

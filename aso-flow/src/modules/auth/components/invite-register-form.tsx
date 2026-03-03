@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { registerAction, RegisterFormData } from "@/src/services/authService"
+import { registerAction, RegisterFormData } from "@/src/modules/auth/services/authService"
 import { z } from "zod"
 import Link from "next/link"
 
@@ -17,7 +17,7 @@ const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6, "Mínimo de 6 caracteres"),
   confirmPassword: z.string(),
-  inviteCode: z.string().optional(), 
+  inviteCode: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "As senhas não coincidem",
   path: ["confirmPassword"],
@@ -87,16 +87,16 @@ export function InviteRegisterForm({ inviteCode, emailPreenchido }: InviteRegist
         </CardHeader>
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-            
+
             <input type="hidden" {...register("inviteCode")} />
 
             <div className="grid gap-2">
               <Label htmlFor="email">E-mail (Trancado)</Label>
-              <Input 
-                id="email" 
-                {...register("email")} 
-                readOnly 
-                className="bg-slate-100 text-slate-500 cursor-not-allowed focus-visible:ring-0" 
+              <Input
+                id="email"
+                {...register("email")}
+                readOnly
+                className="bg-slate-100 text-slate-500 cursor-not-allowed focus-visible:ring-0"
               />
             </div>
 
@@ -113,7 +113,7 @@ export function InviteRegisterForm({ inviteCode, emailPreenchido }: InviteRegist
             </div>
 
             {serverError && <div className="text-sm text-red-500 text-center font-medium bg-red-50 p-2 rounded">{serverError}</div>}
-            
+
             <Button className="w-full mt-2" type="submit" disabled={isLoading}>
               {isLoading ? "A registar..." : "Criar Conta e Entrar"}
             </Button>

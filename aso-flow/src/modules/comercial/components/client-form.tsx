@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { upsertClientAction } from "@/src/services/clientService"
+import { upsertClientAction } from "@/src/modules/comercial/services/clientService"
 
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
@@ -50,23 +50,23 @@ export function ClientForm({ initialData }: ClientFormProps) {
 
   async function onSubmit(data: ClientFormValues) {
     setIsLoading(true)
-  
+
     const response = await upsertClientAction(data as any)
-  
+
     if (response?.error) {
       toast.error(response.error)
       setIsLoading(false)
       return
     }
-  
+
     toast.success(
       initialData
         ? "Cliente atualizado com sucesso!"
         : "Cliente cadastrado com sucesso!"
     )
-  
+
     const clientId = response?.data?.id || data.id
-  
+
     if (initialData && clientId) {
       router.push(`/comercial/clientes/${clientId}`)
     } else if (clientId) {
@@ -74,7 +74,7 @@ export function ClientForm({ initialData }: ClientFormProps) {
     } else {
       router.push("/comercial/clientes")
     }
-  
+
     router.refresh()
   }
 
@@ -92,7 +92,7 @@ export function ClientForm({ initialData }: ClientFormProps) {
         </CardHeader>
         <CardContent>
           <form id="client-form" onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
+
             {/* O ID fica oculto, só será enviado no modo edição */}
             <input type="hidden" {...register("id")} />
 
@@ -132,9 +132,9 @@ export function ClientForm({ initialData }: ClientFormProps) {
 
             <div className="grid gap-2">
               <Label htmlFor="status">Status</Label>
-              <select 
-                id="status" 
-                {...register("status")} 
+              <select
+                id="status"
+                {...register("status")}
                 disabled={isLoading}
                 className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               >

@@ -1,5 +1,5 @@
 import { Metadata } from "next"
-import { InviteForm } from "@/src/components/features/equipe/invite-form"
+import { InviteForm } from "@/src/modules/admin/components/invite-form"
 
 export const metadata: Metadata = {
   title: "Equipe",

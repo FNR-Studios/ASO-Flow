@@ -1,5 +1,5 @@
 import { Metadata } from "next"
-import { getOrganizationAction } from "@/src/services/organizationService"
+import { getOrganizationAction } from "@/src/modules/admin/services/organizationService"
 import Link from "next/link"
 import { Button } from "@/src/components/ui/button"
 import { LayoutDashboard, Settings, Users, ArrowRight, Building2, Handshake } from "lucide-react"
@@ -25,7 +25,7 @@ export default async function SettingsPage() {
                 Bem-vindo ao painel do <span className="font-semibold text-[#357670]">{organization?.name || "seu sistema"}</span>
               </p>
             </div>
-            
+
             {/* Badge da Empresa (Opcional) */}
             <div className="flex items-center gap-3 px-4 py-2 bg-zinc-100 rounded-lg border border-zinc-200 w-fit">
               <Building2 size={20} className="text-zinc-400" />
@@ -47,7 +47,7 @@ export default async function SettingsPage() {
 
         {/* Grid de Serviços/Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          
+
           {/* Card de Administração */}
           <Link href="/admin" className="group">
             <div className="h-full p-6 bg-white rounded-xl border border-zinc-200 shadow-sm transition-all hover:shadow-md hover:border-[#357670]/30 hover:-translate-y-1">

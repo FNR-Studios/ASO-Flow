@@ -1,26 +1,26 @@
-import { createClient } from "../lib/supabase/server";
+import { createClient } from "../../../lib/supabase/server";
 import z from "zod";
-import { getSessionUser } from "./authService";
-import { getOrganizationAction } from "./organizationService";
+import { getSessionUser } from "../../auth/services/authService";
+import { getOrganizationAction } from "../../admin/services/organizationService";
 import { revalidatePath } from "next/cache";
 
 const procedureSchema = z.object({
     id: z.string().uuid().optional(),
     organization_id: z.string().uuid().optional(),
     name: z.string().min(2, "O nome do procedimento é obrigatório."),
-    type: z.enum(["clinico","laboratorial","imagem"]),
+    type: z.enum(["clinico", "laboratorial", "imagem"]),
     base_price: z.number().positive("O preço precisa ser maior que zero."),
     tuss_code: z.string().optional()
 })
 
 export type ProcedureFormData = z.infer<typeof procedureSchema>
 
-export async function upsertProcedureAction(data: ProcedureFormData){
+export async function upsertProcedureAction(data: ProcedureFormData) {
 
     const parsedata = procedureSchema.safeParse(data);
 
-    if(!parsedata.success){
-        return{
+    if (!parsedata.success) {
+        return {
             error: "Dados de formulario inválidos!"
         }
     }
@@ -28,64 +28,64 @@ export async function upsertProcedureAction(data: ProcedureFormData){
     const supabase = await createClient()
 
     const user = await getSessionUser()
-    if(!user){
-        return{
+    if (!user) {
+        return {
             error: "Usuario não autenticado."
         }
     }
 
     const organization = await getOrganizationAction()
 
-    if(!organization){
-        return{
+    if (!organization) {
+        return {
             error: "Usuário não vinculado a nenhuma organização."
         }
     }
 
-    const payload={
+    const payload = {
         ...data,
-        organization_id:(organization.id),
+        organization_id: (organization.id),
     }
 
-    if(!payload.id){
+    if (!payload.id) {
         delete payload.id;
     }
 
-    const{data: procedure, error} = await supabase
+    const { data: procedure, error } = await supabase
         .from('procedures')
         .upsert(payload)
         .select()
         .single()
 
-    if(error){
+    if (error) {
         console.error("Erro ao salvar procedimento: ", error)
-        return{
+        return {
             error: "Ocorreu um erro ao guardar os dados."
         }
     }
 
     revalidatePath('/admin/procedures');
-    return{
+    return {
         success: true,
         data: procedure
     }
 
 }
 
-export async function getProceduresAction(){
+export async function getProceduresAction() {
     const supabase = await createClient()
 
-        const user = await getSessionUser()
-    if(!user){
-        return{
+    const user = await getSessionUser()
+    if (!user) {
+        return {
             error: "Usuario não autenticado."
         }
     }
 
     const organization = await getOrganizationAction()
 
-    if(!organization){
-        return{
+    if (!organization) {
+        return {
             error: "Usuário não vinculado a nenhuma organização."
         }
     }
@@ -95,24 +95,24 @@ export async function getProceduresAction(){
         .select('*')
         .eq('organization_id', (await organization).id)
 
-    return procedures   
+    return procedures
 
 }
 
-export async function getProceduresByIdAction(id: string){
+export async function getProceduresByIdAction(id: string) {
     const supabase = await createClient()
 
-        const user = await getSessionUser()
-    if(!user){
-        return{
+    const user = await getSessionUser()
+    if (!user) {
+        return {
             error: "Usuario não autenticado."
         }
     }
 
     const organization = await getOrganizationAction()
 
-    if(!organization){
-        return{
+    if (!organization) {
+        return {
             error: "Usuário não vinculado a nenhuma organização."
         }
     }
@@ -129,23 +129,23 @@ export async function getProceduresByIdAction(id: string){
         return null
     }
 
-    return procedure   
-    
+    return procedure
+
 }
 
-export async function deleteProcedureAction(id: string){
+export async function deleteProcedureAction(id: string) {
     const supabase = await createClient()
 
     const user = await getSessionUser()
-    if(!user){
-        return{
+    if (!user) {
+        return {
             error: "Usuario não autenticado."
         }
     }
 
     const organization = await getOrganizationAction()
-    if(!organization){
-        return{
+    if (!organization) {
+        return {
             error: "Usuário não vinculado a nenhuma organização."
         }
     }
@@ -155,17 +155,17 @@ export async function deleteProcedureAction(id: string){
         .delete()
         .eq('id', id)
         .eq('organization_id', organization.id)
-    
-    if(error){
+
+    if (error) {
         console.error("Erro ao deletar procedimento: ", error)
-        return{
+        return {
             error: "Ocorreu um erro ao deletar o procedimento."
         }
 
     }
 
     revalidatePath('/admin/procedures');
-    return{
+    return {
         success: true
     }
 }

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { createInviteAction } from "@/src/services/inviteService"
+import { createInviteAction } from "@/src/modules/admin/services/inviteService"
 import { z } from "zod"
 import { toast } from "sonner"
 import { Copy } from "lucide-react"
@@ -42,13 +42,13 @@ export function InviteForm() {
       toast.error(response.error)
     } else if (response?.inviteId) {
       toast.success("Convite gerado com sucesso!")
-      
+
       const link = `${window.location.origin}/register?code=${response.inviteId}`
       setGeneratedLink(link)
-      
+
       reset()
     }
-    
+
     setIsLoading(false)
   }
 
@@ -67,28 +67,28 @@ export function InviteForm() {
           Gere um link de acesso exclusivo para um novo funcionário ou médico da sua clínica.
         </CardDescription>
       </CardHeader>
-      
+
       <CardContent className="space-y-6">
         <form id="invite-form" onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="grid gap-2 md:col-span-2">
               <Label htmlFor="email">E-mail do Funcionário *</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="exemplo@clinica.com" 
-                {...register("email")} 
-                disabled={isLoading} 
+              <Input
+                id="email"
+                type="email"
+                placeholder="exemplo@clinica.com"
+                {...register("email")}
+                disabled={isLoading}
               />
               {errors.email && <span className="text-sm text-red-500">{errors.email.message}</span>}
             </div>
 
             <div className="grid gap-2">
               <Label htmlFor="role">Nível de Acesso *</Label>
-              <select 
-                id="role" 
-                {...register("role")} 
+              <select
+                id="role"
+                {...register("role")}
                 disabled={isLoading}
                 className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >

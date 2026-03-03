@@ -1,8 +1,8 @@
 import { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { createClient } from "@/src/lib/supabase/server"
-import { RegisterForm } from "@/src/components/features/auth/register-form"
-import { InviteRegisterForm } from "@/src/components/features/auth/invite-register-form"
+import { RegisterForm } from "@/src/modules/auth/components/register-form"
+import { InviteRegisterForm } from "@/src/modules/auth/components/invite-register-form"
 
 export const metadata: Metadata = {
   title: "Criar Conta",

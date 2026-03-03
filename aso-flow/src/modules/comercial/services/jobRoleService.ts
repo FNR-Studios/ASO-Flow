@@ -1,8 +1,8 @@
-import { createClient } from "../lib/supabase/server";
+import { createClient } from "../../../lib/supabase/server";
 import z from "zod";
 import { revalidatePath } from "next/cache";
-import { getOrganizationAction } from "./organizationService";
-import { getSessionUser } from "./authService";
+import { getOrganizationAction } from "../../admin/services/organizationService";
+import { getSessionUser } from "../../auth/services/authService";
 import { getClientByIdAction } from "./clientService";
 
 const jobRoleSchema = z.object({

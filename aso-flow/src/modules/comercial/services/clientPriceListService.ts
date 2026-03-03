@@ -1,10 +1,10 @@
-import { createClient } from "../lib/supabase/server"
+import { createClient } from "../../../lib/supabase/server"
 import z from "zod"
-import { getOrganizationAction } from "./organizationService"
+import { getOrganizationAction } from "../../admin/services/organizationService"
 import { revalidatePath } from "next/cache"
 import { getProceduresByIdAction } from "./procedureService"
 import { getClientByIdAction } from "./clientService"
-import { getSessionUser } from "./authService"
+import { getSessionUser } from "../../auth/services/authService"
 
 
 const clientPriceListSchema = z.object({

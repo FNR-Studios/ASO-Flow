@@ -1,9 +1,9 @@
 'use server'
 
-import { createClient } from "../lib/supabase/server"  
+import { createClient } from "../../../lib/supabase/server"
 import { z } from "zod"
 import { revalidatePath } from "next/cache"
-import { getSessionUser } from "./authService"
+import { getSessionUser } from "../../auth/services/authService"
 
 //Esquema de validação Zod
 const organizationSchema = z.object({
@@ -20,12 +20,12 @@ const organizationSchema = z.object({
 
 export type OrganizationFormData = z.infer<typeof organizationSchema>
 
-export async function upsertOrganizationAction(data: OrganizationFormData){
+export async function upsertOrganizationAction(data: OrganizationFormData) {
     const supabase = await createClient()
 
     const user = await getSessionUser()
-    if(!user){
-        return{
+    if (!user) {
+        return {
             error: "Usuario não autenticado."
         }
     }
@@ -44,36 +44,36 @@ export async function upsertOrganizationAction(data: OrganizationFormData){
         .select()
         .single()
 
-    if(error){
+    if (error) {
         console.error("Erro ao guardar organização: ", error)
-        return{
+        return {
             error: "Ocorreu um erro ao guardar os dados."
         }
     }
 
     const { error: profileError } = await supabase
-    .from('profiles')
-    .update({ organization_id: org.id})
-    .eq('id', user.id)
+        .from('profiles')
+        .update({ organization_id: org.id })
+        .eq('id', user.id)
 
     if (profileError) {
         console.error("ERRO AO ATUALIZAR PERFIL: ", profileError);
         return { error: "Organização criada, mas falhou ao vincular ao seu perfil." }
     }
 
-    return{
+    return {
         success: true, org
     }
 }
 
 //Ação para Buscar os Dados Atuais
 
-export async function getOrganizationAction(){
+export async function getOrganizationAction() {
     const supabase = await createClient()
-    
+
     const user = await getSessionUser()
-    if(!user){
-        return{
+    if (!user) {
+        return {
             error: "Usuario não autenticado."
         }
     }
@@ -85,12 +85,12 @@ export async function getOrganizationAction(){
         .eq('id', user.id)
         .single()
 
-    if(!profile?.organization_id){
+    if (!profile?.organization_id) {
         return null
     }
 
     // Depois busca os dados da empresa)
-    const { data:org } = await supabase
+    const { data: org } = await supabase
         .from('organizations')
         .select('*')
         .eq('id', profile.organization_id)

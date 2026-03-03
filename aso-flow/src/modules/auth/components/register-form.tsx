@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { registerAction, RegisterFormData } from "@/src/services/authService"
+import { registerAction, RegisterFormData } from "@/src/modules/auth/services/authService"
 import { z } from "zod"
 import Link from "next/link"
 
@@ -13,9 +13,9 @@ import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 
 const registerSchema = z.object({
-  email: z.string().email("Insira um e-mail válido"),
-  password: z.string().min(6, "A senha é obrigatória"),
-  confirmPassword: z.string(),
+    email: z.string().email("Insira um e-mail válido"),
+    password: z.string().min(6, "A senha é obrigatória"),
+    confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
     message: "As senhas não coincidem",
     path: ["confirmPassword"],
@@ -24,42 +24,42 @@ const registerSchema = z.object({
 export function RegisterForm() {
     const [serverError, setServerError] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(false)
-  
+
     const {
-        register, handleSubmit, formState: {errors},
+        register, handleSubmit, formState: { errors },
     } = useForm<RegisterFormData>({
         resolver: zodResolver(registerSchema),
     })
 
-    async function onSubmit(data: RegisterFormData){
+    async function onSubmit(data: RegisterFormData) {
         setIsLoading(true)
         setServerError(null)
 
         const response = await registerAction(data)
 
-        if(response?.error){
+        if (response?.error) {
             setServerError(response.error)
             setIsLoading(false)
         }
 
     }
 
-    return(
+    return (
         <div className="flex-1 flex flex-col items-center justify-center p-8 gap-4">
             <Card className="w-full max-w-sm">
                 <CardHeader>
                     <CardTitle className="text-2xl text-center">ASO FLow</CardTitle>
                     <CardDescription className="text-center">
                         Crie uma conta para acessar o sistema.
-                    </CardDescription>  
+                    </CardDescription>
                 </CardHeader>
 
                 <CardContent>
                     <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
                         <div className="grid gap-2">
                             <Label htmlFor="email">E-mail</Label>
-                            <Input id="email" type="email" placeholder="nome@mail.com" disabled={isLoading} {...register("email")}/>
-                            {errors.email &&(
+                            <Input id="email" type="email" placeholder="nome@mail.com" disabled={isLoading} {...register("email")} />
+                            {errors.email && (
                                 <span className="text-sm text-red-500 font-medium">
                                     {errors.email.message}
                                 </span>
@@ -68,7 +68,7 @@ export function RegisterForm() {
                         <div className="grid gap-2">
                             <Label htmlFor="password">Senha</Label>
                             <Input id="password" type="password" disabled={isLoading} {...register("password")} />
-                            {errors.password &&(
+                            {errors.password && (
                                 <span className="text-sm text-red-500 font-medium">
                                     {errors.password.message}
                                 </span>
@@ -77,7 +77,7 @@ export function RegisterForm() {
                         <div className="grid gap-2">
                             <Label htmlFor="confirmPassword">Confirme a senha</Label>
                             <Input id="confirmPassword" type="password" disabled={isLoading} {...register("confirmPassword")} />
-                            {errors.confirmPassword &&(
+                            {errors.confirmPassword && (
                                 <span className="text-sm text-red-500 font-medium">
                                     {errors.confirmPassword.message}
                                 </span>

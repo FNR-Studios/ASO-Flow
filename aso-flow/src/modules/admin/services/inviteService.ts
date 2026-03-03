@@ -1,25 +1,25 @@
 'use server'
 
-import { createClient } from "../lib/supabase/server"
+import { createClient } from "../../../lib/supabase/server"
 import { z } from "zod"
 import { revalidatePath } from "next/cache"
 import { create } from "domain"
 
 // Esquema de validação para a criação do convite
 const createInviteSchema = z.object({
-  email: z.string().email("Insira um e-mail válido para o convite."),
-  role: z.enum(['ADMIN', 'OPERADOR']), 
+    email: z.string().email("Insira um e-mail válido para o convite."),
+    role: z.enum(['ADMIN', 'OPERADOR']),
 })
 
 export type CreateInviteFormData = z.infer<typeof createInviteSchema>
 
-export async function createInviteAction(data: CreateInviteFormData){
+export async function createInviteAction(data: CreateInviteFormData) {
     const supabase = await createClient()
 
     //Verificação de usuario logado
     const { data: { user } } = await supabase.auth.getUser()
-    if(!user){
-        return{
+    if (!user) {
+        return {
             error: "Usuario não autenticado."
         }
     }
@@ -31,8 +31,8 @@ export async function createInviteAction(data: CreateInviteFormData){
         .eq('id', user.id)
         .single()
 
-    if(!profile?.organization_id){
-        return{
+    if (!profile?.organization_id) {
+        return {
             error: "Usuario não pertence a uma organização."
         }
     }
@@ -46,8 +46,8 @@ export async function createInviteAction(data: CreateInviteFormData){
         .eq('used', false)
         .single()
 
-    if(existingInvite){
-        return{
+    if (existingInvite) {
+        return {
             error: "Já existe um convite pendente para esse email."
         }
     }
@@ -65,17 +65,17 @@ export async function createInviteAction(data: CreateInviteFormData){
         .insert(payload)
         .select('id')
         .single()
-    
-    if(error){
+
+    if (error) {
         console.error("Erro ao criar convite: ", error)
-        return{
+        return {
             error: "Ocorreu um erro ao criar o convite."
         }
     }
 
     revalidatePath('/admin/equipe')
 
-    return{
+    return {
         success: true,
         inviteId: newInvite.id
     }

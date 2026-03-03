@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { loginAction, LoginFormData } from "@/src/services/authService"
+import { loginAction, LoginFormData } from "@/src/modules/auth/services/authService"
 import { z } from "zod"
 import Link from "next/link"
 
@@ -99,8 +99,8 @@ export function LoginForm() {
           </form>
         </CardContent>
         <CardFooter className="flex flex-col gap-2 text-center">
-          <Link 
-            href="/forgot-password" 
+          <Link
+            href="/forgot-password"
             className="text-sm text-muted-foreground underline hover:text-primary transition-colors"
           >
             Esqueceu a senha?
@@ -108,9 +108,9 @@ export function LoginForm() {
           <div className="text-sm">
             Não tem uma conta?{" "}
             <Link href="/register" className="underline hover:text-primary">
-                Cadastre-se
+              Cadastre-se
             </Link>
-            </div>
+          </div>
         </CardFooter>
       </Card>
     </div>

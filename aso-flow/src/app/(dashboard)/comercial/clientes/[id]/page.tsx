@@ -3,7 +3,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft, Building2 } from "lucide-react"
 
-import { getClientByIdAction } from "@/src/services/clientService"
+import { getClientByIdAction } from "@/src/modules/comercial/services/clientService"
 import { Button } from "@/src/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
@@ -18,7 +18,7 @@ export default async function ClienteDashboardPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  
+
   // 1. Busca os dados do cliente no servidor
   const cliente = await getClientByIdAction(id)
 
@@ -51,7 +51,7 @@ export default async function ClienteDashboardPage({
             </p>
           </div>
         </div>
-        
+
         <Link href={`/comercial/clientes/${cliente.id}/editar`}>
           <Button variant="outline">Editar Dados</Button>
         </Link>
@@ -80,7 +80,7 @@ export default async function ClienteDashboardPage({
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Grau de Risco</CardTitle>
