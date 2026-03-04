@@ -15,6 +15,7 @@ import { Label } from "@/src/components/ui/label"
 // O .optional() foi adicionado aqui no inviteCode para bater perfeitamente com o backend
 const registerSchema = z.object({
   email: z.string().email(),
+  full_name: z.string().min(3, "O nome é obrigatório"),
   password: z.string().min(6, "Mínimo de 6 caracteres"),
   confirmPassword: z.string(),
   inviteCode: z.string().optional(),
@@ -38,6 +39,9 @@ export function InviteRegisterForm({ inviteCode, emailPreenchido }: InviteRegist
     defaultValues: {
       email: emailPreenchido,
       inviteCode: inviteCode,
+      full_name: "",
+      password: "",
+      confirmPassword: "",
     }
   })
 
@@ -89,6 +93,16 @@ export function InviteRegisterForm({ inviteCode, emailPreenchido }: InviteRegist
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
 
             <input type="hidden" {...register("inviteCode")} />
+
+            <div className="grid gap-2">
+              <Label htmlFor="full_name">Nome completo</Label>
+              <Input id="full_name" placeholder="João Silva" disabled={isLoading} {...register("full_name")} />
+              {errors.full_name && (
+                  <span className="text-sm text-red-500 font-medium">
+                      {errors.full_name.message}
+                  </span>
+              )}
+            </div>  
 
             <div className="grid gap-2">
               <Label htmlFor="email">E-mail (Trancado)</Label>
