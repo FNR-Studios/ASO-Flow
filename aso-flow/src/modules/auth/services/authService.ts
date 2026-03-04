@@ -12,9 +12,10 @@ const loginSchema = z.object({
 
 const registerSchema = z.object({
   email: z.string().email(),
+  full_name: z.string().min(3, "O nome é obrigatório"),
   password: z.string().min(6, "Mínimo de 6 caracteres"),
   confirmPassword: z.string(),
-  inviteCode: z.string().optional(), // A CORREÇÃO ESTÁ AQUI: Adicionamos o .optional()
+  inviteCode: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "As senhas não coincidem",
   path: ["confirmPassword"],
@@ -65,8 +66,10 @@ export async function registerAction(data: RegisterFormData) {
     email: data.email,
     password: data.password,
     options: {
-      data: { full_name: "Novo Usuário" }
-    }
+      data: {
+        full_name: data.full_name,
+      },
+    },
   })
 
   if (error) return { error: error.message }
@@ -95,6 +98,7 @@ export async function registerAction(data: RegisterFormData) {
 
 export async function getSessionUser() {
   const supabase = await createClient()
+  
   const { data: { user }, error } = await supabase.auth.getUser()
 
   if (error || !user) return null

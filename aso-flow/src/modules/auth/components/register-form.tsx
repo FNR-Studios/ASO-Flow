@@ -14,6 +14,7 @@ import { Label } from "@/src/components/ui/label"
 
 const registerSchema = z.object({
     email: z.string().email("Insira um e-mail válido"),
+    full_name: z.string().min(3, "O nome é obrigatório"),
     password: z.string().min(6, "A senha é obrigatória"),
     confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -56,6 +57,16 @@ export function RegisterForm() {
 
                 <CardContent>
                     <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="full_name">Nome completo</Label>
+                            <Input id="full_name" placeholder="João Silva" disabled={isLoading} {...register("full_name")} />
+                            {errors.full_name && (
+                                <span className="text-sm text-red-500 font-medium">
+                                    {errors.full_name.message}
+                                </span>
+                            )}
+                        </div>                        
                         <div className="grid gap-2">
                             <Label htmlFor="email">E-mail</Label>
                             <Input id="email" type="email" placeholder="nome@mail.com" disabled={isLoading} {...register("email")} />
