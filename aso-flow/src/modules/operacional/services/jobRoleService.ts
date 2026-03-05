@@ -1,14 +1,15 @@
+'use server'
+
 import { createClient } from "../../../lib/supabase/server";
 import z from "zod";
-import { revalidatePath } from "next/cache";
 import { getOrganizationAction } from "../../admin/services/organizationService";
 import { getSessionUser } from "../../auth/services/authService";
 import { getClientByIdAction } from "../../comercial/services/clientService";
 
 const jobRoleSchema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().optional(),
   organization_id: z.string().uuid().optional(),
-  client_id: z.string().uuid("Cliente inválido."),
+  client_id: z.string().min(1, "Selecione um cliente válido."),
   title: z.string().min(2, "O título do cargo é obrigatório."),
   cbo_code: z.string().optional(),
   description: z.string().optional(),
@@ -65,8 +66,6 @@ export async function upsertJobRoleAction(data: JobRoleFormData) {
     return { error: "Ocorreu um erro ao salvar o cargo." };
   }
 
-  revalidatePath("/cargos");
-
   return {
     success: true,
     data: jobRole,
@@ -82,13 +81,32 @@ export async function getJobRolesAction() {
   const organization = await getOrganizationAction();
   if (!organization) return null;
 
-  const { data: jobRoles } = await supabase
+  const { data: jobRoles, error} = await supabase
     .from("job_roles")
-    .select("*")
+    .select("*, clients:clients (trade_name)")
     .eq("organization_id", organization.id)
     .order("created_at", { ascending: false });
 
-  return jobRoles;
+    if (error) {
+      console.error("Erro ao buscar cargos:", error);
+      return [];
+    }
+
+    if (!jobRoles) return [];
+
+    const formattedJobRoles = jobRoles.map((role) => {
+      return {
+        id: role.id,
+        title: role.title,
+        cbo_code: role.cbo_code || "",
+        description: role.description || "",
+        // Aqui ele pega o nome que veio da tabela conectada. 
+        // Se não vier nada, ele escreve "Cliente não encontrado"
+        client_name: role.client?.trade_name || "Cliente não encontrado", 
+      }
+    });
+
+  return formattedJobRoles;
 }
 
 export async function getJobRoleByIdAction(id: string) {
@@ -129,8 +147,6 @@ export async function deleteJobRoleAction(id: string) {
     console.error("Erro ao deletar cargo:", error);
     return { error: "Ocorreu um erro ao deletar o cargo." };
   }
-
-  revalidatePath("/cargos");
 
   return { success: true };
 }

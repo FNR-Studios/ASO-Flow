@@ -3,7 +3,7 @@ import { getClientAction } from "../services/clientService"
 
 export function useClients() {
   return useQuery({
-    queryKey: ["clients"], // Esta é a "chave" do cache.
+    queryKey: ["clients"],
     queryFn: async () => {
       const data = await getClientAction()
       return data || [] 
