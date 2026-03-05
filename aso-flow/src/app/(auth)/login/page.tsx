@@ -1,5 +1,7 @@
 import { Metadata } from "next"
 import { LoginForm } from "@/src/modules/auth/components/login-form"
+import { Header } from "@/src/components/layout/Header"
+import { Footer } from "@/src/components/layout/Footer"
 
 export const metadata: Metadata = {
   title: "Login",
@@ -7,5 +9,11 @@ export const metadata: Metadata = {
 }
 
 export default function LoginPage() {
-  return <LoginForm />
+  return ( 
+    <>
+    <Header/ >
+    <LoginForm />
+    <Footer/ >
+    </>
+)
 }

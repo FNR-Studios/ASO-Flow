@@ -2,7 +2,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="w-full bg-[#121212] text-zinc-500 py-6 px-8 border-t border-white/5">
+    <footer className="w-full bg-foreground text-zinc-500 py-6 px-8 border-t border-white/5">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         
         {/* Lado Esquerdo */}

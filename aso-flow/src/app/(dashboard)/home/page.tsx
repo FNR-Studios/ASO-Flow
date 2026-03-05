@@ -2,7 +2,7 @@ import { Metadata } from "next"
 import { getOrganizationAction } from "@/src/modules/admin/services/organizationService"
 import Link from "next/link"
 import { Button } from "@/src/components/ui/button"
-import { LayoutDashboard, Settings, Users, ArrowRight, Building2, Handshake } from "lucide-react"
+import { LayoutDashboard, Settings, Users, ArrowRight, Building2, Handshake, SquareActivity } from "lucide-react"
 import { getSessionUser } from "@/src/modules/auth/services/authService"
 
 export const metadata: Metadata = {
@@ -28,7 +28,7 @@ export default async function SettingsPage() {
   const firstName = fullName.split(' ')[0]
 
   return (
-    <div className="flex-1 w-full bg-zinc-50/50">
+    <div className="flex-1 w-full bg-zinc">
       {/* Header de Boas-vindas Interno */}
       <div className="bg-white border-b border-zinc-200">
         <div className="max-w-7xl mx-auto px-8 py-8">
@@ -47,7 +47,7 @@ export default async function SettingsPage() {
               <Building2 size={20} className="text-zinc-400" />
               <div className="text-sm">
                 <p className="text-zinc-400 text-[10px] uppercase font-bold leading-none">Empresa Ativa</p>
-                <p className="font-bold text-zinc-700">{organization?.corporate_name || "Carregando..."}</p>
+                <p className="font-bold text-zinc-700">{organization?.corporate_name || "Sem organzização..."}</p>
               </div>
             </div>
           </div>
@@ -92,6 +92,22 @@ export default async function SettingsPage() {
               <h3 className="text-lg font-bold text-zinc-800 mb-2">Comercial</h3>
               <p className="text-sm text-zinc-500 leading-relaxed">
                 Gerencie seus clientes, procedimentos e tabelas de preços.
+              </p>
+            </div>
+          </Link>
+
+          {/* Card Operacional*/}
+          <Link href="/operacional" className="group">
+            <div className="h-full p-6 bg-white rounded-xl border border-zinc-200 shadow-sm transition-all hover:shadow-md hover:border-[#357670]/30 hover:-translate-y-1">
+              <div className="flex items-start justify-between mb-4">
+                <div className="p-3 bg-emerald-50 rounded-lg text-[#357670] group-hover:bg-[#357670] group-hover:text-white transition-colors">
+                  <SquareActivity size={24} />
+                </div>
+                <ArrowRight size={20} className="text-zinc-300 group-hover:text-[#357670] transition-colors" />
+              </div>
+              <h3 className="text-lg font-bold text-zinc-800 mb-2">Operacional</h3>
+              <p className="text-sm text-zinc-500 leading-relaxed">
+                Gerencie seus exames e procedimentos, PCMSO, cadastre cargos e funcionarios.
               </p>
             </div>
           </Link>

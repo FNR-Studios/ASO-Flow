@@ -3,6 +3,8 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/src/lib/supabase/server"
 import { RegisterForm } from "@/src/modules/auth/components/register-form"
 import { InviteRegisterForm } from "@/src/modules/auth/components/invite-register-form"
+import { Header } from "@/src/components/layout/Header"
+import { Footer } from "@/src/components/layout/Footer"
 
 export const metadata: Metadata = {
   title: "Criar Conta",
@@ -17,7 +19,13 @@ export default async function RegisterPage({
 
   // CÁLCULO 1: Se a URL NÃO tem código, é o fluxo padrão (Dono da Clínica)
   if (!code) {
-    return <RegisterForm />
+    return (
+      <>
+        <Header />
+        <RegisterForm />
+        <Footer />
+      </>
+    )
   }
 
   // CÁLCULO 2: Se a URL TEM código, vamos validar no banco antes de renderizar
@@ -35,5 +43,11 @@ export default async function RegisterPage({
   }
 
   // Se tudo estiver certo, mostra o formulário especial de funcionário!
-  return <InviteRegisterForm inviteCode={invite.id} emailPreenchido={invite.email} />
+  return (
+    <>
+      <Header />
+      <InviteRegisterForm inviteCode={invite.id} emailPreenchido={invite.email} />
+      <Footer />
+    </>
+  )
 }
