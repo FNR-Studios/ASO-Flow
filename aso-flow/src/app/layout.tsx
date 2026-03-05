@@ -35,15 +35,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-[#E0E2E2]`}
       >
-        <Header />
         {/* O main com flex-1 empurra o footer para o fim da tela */}
         <main className="flex-1 flex flex-col">
         <QueryProvider>
           {children}
           </QueryProvider>
+          <Footer />
         </main>
         <Toaster richColors position="top-right" />
-        <Footer />
       </body>
     </html>
   );

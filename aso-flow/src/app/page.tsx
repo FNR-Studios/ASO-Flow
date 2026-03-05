@@ -2,12 +2,17 @@ import { checkDatabaseConnection } from "@/src/server/db/test-connection"
 import { Button } from "../components/ui/button"
 import Link from "next/link"
 import { Database, ArrowRight, ShieldCheck } from "lucide-react"
+import { Header } from "../components/layout/Header"
+import { Footer } from "../components/layout/Footer"
 
 export default async function Home() {
   const status = await checkDatabaseConnection()
 
   return (
+    <>
+    <Header />
     <div className="flex-1 flex flex-col items-center justify-center p-4 gap-4">
+      
 
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         {/* Seção de Texto Hero */}
@@ -72,5 +77,7 @@ export default async function Home() {
       </main>
 
     </div>
+    <Footer />
+    </>
   )
 }
