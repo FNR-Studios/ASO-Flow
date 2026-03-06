@@ -4,9 +4,11 @@ import { notFound } from "next/navigation"
 import { ArrowLeft, Building2 } from "lucide-react"
 
 import { getClientByIdAction } from "@/src/modules/comercial/services/clientService"
+import { getClientPriceListByClientAction } from "@/src/modules/comercial/services/clientPriceListService"
 import { Button } from "@/src/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { ClientPriceExceptionsTab } from "@/src/modules/comercial/components/client-price-exceptions-tab"
 
 export const metadata: Metadata = {
   title: "Painel do Cliente | ASO Flow",
@@ -26,6 +28,9 @@ export default async function ClienteDashboardPage({
   if (!cliente) {
     notFound()
   }
+
+  // 2. Busca as exceções de preço do cliente
+  const priceList = await getClientPriceListByClientAction(id)
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 w-full p-4">
@@ -120,9 +125,12 @@ export default async function ClienteDashboardPage({
           </Card>
         </TabsContent>
 
-        {/* Demais abas... (Funcionários, Preços, Histórico) seguirão a mesma lógica */}
-        <TabsContent value="tabela-precos">
-          <Card><CardContent className="pt-6">Tabela de Preços em construção...</CardContent></Card>
+        {/* CONTEÚDO DA ABA 3: TABELA DE PREÇOS (EXCEÇÕES) */}
+        <TabsContent value="tabela-precos" className="mt-6">
+          <ClientPriceExceptionsTab 
+            clientId={cliente.id} 
+            initialPriceList={priceList as any} 
+          />
         </TabsContent>
         <TabsContent value="funcionarios">
           <Card><CardContent className="pt-6">Funcionários em construção...</CardContent></Card>

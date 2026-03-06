@@ -144,3 +144,35 @@ export async function getClientProcedurePriceAction(
 
   return price.custom_price
 }
+
+export async function deleteClientPriceListAction(
+  clientId: string,
+  procedureId: string
+) {
+  const supabase = await createClient()
+
+  const user = await getSessionUser()
+  if (!user) {
+    return { error: "Usuário não autenticado." }
+  }
+
+  const organization = await getOrganizationAction()
+  if (!organization) {
+    return { error: "Usuário não vinculado a nenhuma organização." }
+  }
+
+  const { error } = await supabase
+    .from("client_price_list")
+    .delete()
+    .eq("client_id", clientId)
+    .eq("procedure_id", procedureId)
+
+  if (error) {
+    console.error("Erro ao remover exceção de preço:", error)
+    return { error: "Ocorreu um erro ao remover a exceção de preço." }
+  }
+
+  revalidatePath(`/comercial/clientes/${clientId}`)
+
+  return { success: true }
+}
