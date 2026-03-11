@@ -7,13 +7,21 @@ import { z } from "zod"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { upsertClientAction } from "@/src/modules/comercial/services/clientService"
+import { bulkUpsertClientPriceListAction } from "@/src/modules/comercial/services/clientPriceListService"
 
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/src/components/ui/card"
 import { ArrowLeft } from "lucide-react"
-
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/src/components/ui/table"
 
 const clientFormSchema = z.object({
   id: z.string().optional(),
@@ -28,12 +36,21 @@ const clientFormSchema = z.object({
 
 export type ClientFormValues = z.infer<typeof clientFormSchema>
 
-interface ClientFormProps {
-  initialData?: ClientFormValues | null;
+interface Procedure {
+  id: string
+  name: string
+  base_price: number
 }
 
-export function ClientForm({ initialData }: ClientFormProps) {
+interface ClientFormProps {
+  initialData?: ClientFormValues | null;
+  procedures?: Procedure[];
+  initialPrices?: Record<string, number>;
+}
+
+export function ClientForm({ initialData, procedures = [], initialPrices = {} }: ClientFormProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [customPrices, setCustomPrices] = useState<Record<string, number>>(initialPrices)
   const router = useRouter()
 
   const { register, handleSubmit, formState: { errors } } = useForm({
@@ -51,6 +68,7 @@ export function ClientForm({ initialData }: ClientFormProps) {
   async function onSubmit(data: ClientFormValues) {
     setIsLoading(true)
 
+    // 1. Salvar o cliente
     const response = await upsertClientAction(data as any)
 
     if (response?.error) {
@@ -59,27 +77,51 @@ export function ClientForm({ initialData }: ClientFormProps) {
       return
     }
 
+    const clientId = response?.data?.id || data.id
+
+    if (!clientId) {
+      toast.error("Erro ao obter o ID do cliente.")
+      setIsLoading(false)
+      return
+    }
+
+    // 2. Salvar os preços personalizados
+    const pricesArray = Object.entries(customPrices)
+      .filter(([_, price]) => price > 0)
+      .map(([procedureId, price]) => ({
+        procedure_id: procedureId,
+        custom_price: price
+      }))
+
+    const priceResponse = await bulkUpsertClientPriceListAction(clientId, pricesArray)
+
+    if (priceResponse?.error) {
+      toast.error(`Erro ao salvar preços: ${priceResponse.error}`)
+    }
+
     toast.success(
       initialData
-        ? "Cliente atualizado com sucesso!"
+        ? "Cliente e preços atualizados com sucesso!"
         : "Cliente cadastrado com sucesso!"
     )
 
-    const clientId = response?.data?.id || data.id
-
-    if (initialData && clientId) {
-      router.push(`/comercial/clientes/${clientId}`)
-    } else if (clientId) {
-      router.push(`/comercial/clientes/${clientId}`)
-    } else {
-      router.push("/comercial/clientes")
-    }
-
+    router.push(`/comercial/clientes/${clientId}`)
     router.refresh()
   }
 
+  const handlePriceChange = (procedureId: string, value: string) => {
+    const numValue = parseFloat(value)
+    if (isNaN(numValue) || numValue <= 0) {
+      const newPrices = { ...customPrices }
+      delete newPrices[procedureId]
+      setCustomPrices(newPrices)
+    } else {
+      setCustomPrices({ ...customPrices, [procedureId]: numValue })
+    }
+  }
+
   return (
-    <div className="max-w-3xl mx-auto space-y-4">
+    <div className="max-w-4xl mx-auto space-y-6 pb-10">
       <Button variant="ghost" onClick={() => router.push("/comercial/clientes")} className="mb-4">
         <ArrowLeft className="w-4 h-4 mr-2" /> Voltar para a lista
       </Button>
@@ -92,7 +134,6 @@ export function ClientForm({ initialData }: ClientFormProps) {
         </CardHeader>
         <CardContent>
           <form id="client-form" onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
             {/* O ID fica oculto, só será enviado no modo edição */}
             <input type="hidden" {...register("id")} />
 
@@ -144,9 +185,57 @@ export function ClientForm({ initialData }: ClientFormProps) {
             </div>
           </form>
         </CardContent>
+      </Card>
+
+      {/* Seção de Preços Personalizados */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">Preços Personalizados</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Defina preços específicos para este cliente. Se deixado em branco, o preço base do procedimento será utilizado.
+          </p>
+        </CardHeader>
+        <CardContent>
+          {procedures.length > 0 ? (
+            <div className="border rounded-md">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Procedimento</TableHead>
+                    <TableHead>Preço Base (R$)</TableHead>
+                    <TableHead className="w-[200px]">Preço Personalizado (R$)</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {procedures.map((proc) => (
+                    <TableRow key={proc.id}>
+                      <TableCell className="font-medium">{proc.name}</TableCell>
+                      <TableCell>R$ {proc.base_price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
+                      <TableCell>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder={proc.base_price.toString()}
+                          value={customPrices[proc.id] || ""}
+                          onChange={(e) => handlePriceChange(proc.id, e.target.value)}
+                          disabled={isLoading}
+                          className="h-8"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <p className="text-sm text-center py-4 text-muted-foreground">
+              Nenhum procedimento cadastrado no sistema.
+            </p>
+          )}
+        </CardContent>
         <CardFooter className="flex justify-end border-t p-6">
           <Button form="client-form" type="submit" disabled={isLoading} className="bg-blue-600 hover:bg-blue-700">
-            {isLoading ? "A guardar..." : "Salvar Cliente"}
+            {isLoading ? "A guardar..." : "Salvar Cliente e Preços"}
           </Button>
         </CardFooter>
       </Card>

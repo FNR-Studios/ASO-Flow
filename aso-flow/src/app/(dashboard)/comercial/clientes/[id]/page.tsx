@@ -4,9 +4,19 @@ import { notFound } from "next/navigation"
 import { ArrowLeft, Building2 } from "lucide-react"
 
 import { getClientByIdAction } from "@/src/modules/comercial/services/clientService"
+import { getProceduresAction } from "@/src/modules/operacional/services/procedureService"
+import { getClientPriceListByClientAction } from "@/src/modules/comercial/services/clientPriceListService"
 import { Button } from "@/src/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/src/components/ui/table"
 
 export const metadata: Metadata = {
   title: "Painel do Cliente | ASO Flow",
@@ -19,13 +29,29 @@ export default async function ClienteDashboardPage({
 }) {
   const { id } = await params
 
-  // 1. Busca os dados do cliente no servidor
-  const cliente = await getClientByIdAction(id)
+  // 1. Busca os dados do cliente, procedimentos e lista de preços no servidor
+  const [cliente, procedures, priceList] = await Promise.all([
+    getClientByIdAction(id),
+    getProceduresAction(),
+    getClientPriceListByClientAction(id),
+  ])
 
   // Se o cliente não existir (ou for de outra clínica e o RLS bloquear), mostra a página 404
   if (!cliente) {
     notFound()
   }
+
+  // Converter a lista de preços em um objeto Record<procedureId, custom_price>
+  const customPrices: Record<string, number> = {}
+  if (Array.isArray(priceList)) {
+    priceList.forEach((item) => {
+      if (item.procedure_id && item.custom_price) {
+        customPrices[item.procedure_id] = item.custom_price
+      }
+    })
+  }
+
+  const validProcedures = Array.isArray(procedures) ? procedures : []
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 w-full p-4">
@@ -121,9 +147,63 @@ export default async function ClienteDashboardPage({
         </TabsContent>
 
         {/* Demais abas... (Funcionários, Preços, Histórico) seguirão a mesma lógica */}
-        <TabsContent value="tabela-precos">
-          <Card><CardContent className="pt-6">Tabela de Preços em construção...</CardContent></Card>
+        <TabsContent value="tabela-precos" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Tabela de Preços do Cliente</CardTitle>
+              <CardDescription>
+                Visualize os preços aplicados para este cliente. Preços destacados em azul são personalizados.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {validProcedures.length > 0 ? (
+                <div className="border rounded-md">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Procedimento</TableHead>
+                        <TableHead>Preço Aplicado (R$)</TableHead>
+                        <TableHead>Tipo de Preço</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {validProcedures.map((proc) => {
+                        const customPrice = customPrices[proc.id!]
+                        const isCustom = !!customPrice
+                        const finalPrice = customPrice || proc.base_price
+
+                        return (
+                          <TableRow key={proc.id}>
+                            <TableCell className="font-medium">{proc.name}</TableCell>
+                            <TableCell className={isCustom ? "text-blue-600 font-bold" : ""}>
+                              R$ {finalPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                            </TableCell>
+                            <TableCell>
+                              {isCustom ? (
+                                <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                                  Personalizado
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-800">
+                                  Base
+                                </span>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                <div className="h-40 flex items-center justify-center border-2 border-dashed rounded-lg text-slate-400">
+                  Nenhum procedimento cadastrado.
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
+
         <TabsContent value="funcionarios">
           <Card><CardContent className="pt-6">Funcionários em construção...</CardContent></Card>
         </TabsContent>
