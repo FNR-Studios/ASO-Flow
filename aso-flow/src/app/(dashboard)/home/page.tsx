@@ -3,18 +3,17 @@ import { getOrganizationAction } from "@/src/modules/admin/services/organization
 import Link from "next/link"
 import { Button } from "@/src/components/ui/button"
 import { LayoutDashboard, Settings, Users, ArrowRight, Building2, Handshake, SquareActivity } from "lucide-react"
-import { getSessionUser } from "@/src/modules/auth/services/authService"
+import { getSessionUser, getUserName } from "@/src/modules/auth/services/authService"
 
 export const metadata: Metadata = {
   title: "Início | ASO Flow",
 }
 
-export default async function SettingsPage() {
+export default async function HomePage() {
   const organization = await getOrganizationAction()
 
   const user = await getSessionUser()
 
-  // Lógica de saudação
   const hour = new Date().getHours()
   let greeting = "Bom dia"
 
@@ -24,8 +23,9 @@ export default async function SettingsPage() {
     greeting = "Boa noite"
   }
 
-  const fullName = user?.user_metadata?.full_name || "Usuário"
+  const fullName = await getUserName() || ""
   const firstName = fullName.split(' ')[0]
+  const id = user?.id
 
   return (
     <div className="flex-1 w-full bg-zinc">
@@ -35,10 +35,11 @@ export default async function SettingsPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900">
-              {greeting}, <span className="font-bold text-zinc-900">{firstName}</span>!
+              {greeting} <span className="font-bold text-zinc-900">{firstName}</span>!
               </h1>
-              <p className="text-zinc-500 mt-1">
-                Bem-vindo ao painel do <span className="font-semibold text-[#357670]">{organization?.name || "seu sistema"}</span>
+              <p className="text-zinc-500 mt-1">  
+                Bem-vindo ao painel do <span className="font-semibold text-[#357670]">{organization?.name || "seu sistema"} 
+                </span>
               </p>
             </div>
 

@@ -104,3 +104,26 @@ export async function getSessionUser() {
   if (error || !user) return null
   return user
 }
+
+export async function getUserName(){
+  const supabase = await createClient()
+
+  const user = await getSessionUser()
+
+  if(!user){
+    return null
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('full_name')
+    .eq('id', user.id)
+    .single()
+
+  if(!profile){
+    return null
+  }
+
+  return profile.full_name
+
+}

@@ -33,6 +33,11 @@ const menuModules = [
     label: "Comercial",
     items: [
       { title: "Clientes", url: "/comercial/clientes", icon: Briefcase },
+    ]
+  },
+  {
+    label: "Financeiro",
+    items:[
       { title: "Faturas / Cobranças", url: "/financeiro/faturas", icon: DollarSign },
     ]
   },
